@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Project Path="BilliardSimulation.Data/BilliardSimulation.Data.csproj" />
+  <Project Path="BilliardSimulation.Logic/BilliardSimulation.Logic.csproj" />
+  <Project Path="BilliardSimulation.Model/BilliardSimulation.Model.csproj" />
+  <Project Path="BilliardSimulation.ViewModel/BilliardSimulation.ViewModel.csproj" />
+  <Project Path="View/View.csproj" />
+</Solution>
