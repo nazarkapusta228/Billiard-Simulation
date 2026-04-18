@@ -17,7 +17,7 @@ namespace View
             // Create dependencies here (composition root)
             IBallRepository repository = new BallRepository();
             IBallLogic logic = new BallLogic(repository);
-            var viewModel = new MainViewModel(repository, logic);
+            var viewModel = new MainViewModel(logic);
 
             var mainWindow = new MainWindow();
             mainWindow.DataContext = viewModel;

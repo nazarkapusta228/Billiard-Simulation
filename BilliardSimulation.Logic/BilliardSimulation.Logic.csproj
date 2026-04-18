@@ -6,6 +6,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\BilliardSimulation.Data\BilliardSimulation.Data.csproj" />
+		<ProjectReference Include="..\BilliardSimulation.Model\BilliardSimulation.Model.csproj" />
 	</ItemGroup>
 
 </Project>

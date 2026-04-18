@@ -61,8 +61,8 @@ namespace BilliardSimulation.Tests
             var list = new List<Ball> { ball };
             logic.UpdatePositions(list, width, height);
 
-            // After update, ball should be placed at width - radius and velocityX inverted
-            Assert.AreEqual(width - ball.Radius, ball.X);
+            // After update, ball should be placed at width - radius - visualMargin (1.0) and velocityX inverted
+            Assert.AreEqual(width - ball.Radius - 1.0, ball.X);
             Assert.AreEqual(-5, ball.VelocityX);
         }
 
@@ -78,7 +78,7 @@ namespace BilliardSimulation.Tests
             var list = new List<Ball> { ball };
             logic.UpdatePositions(list, width, height);
 
-            Assert.AreEqual(ball.Radius, ball.X);
+            Assert.AreEqual(ball.Radius + 1.0, ball.X);
             Assert.AreEqual(10, ball.VelocityX);
         }
 
@@ -95,10 +95,10 @@ namespace BilliardSimulation.Tests
             logic.UpdatePositions(new List<Ball> { ballTop }, width, height);
             logic.UpdatePositions(new List<Ball> { ballBottom }, width, height);
 
-            Assert.AreEqual(ballTop.Radius, ballTop.Y);
+            Assert.AreEqual(ballTop.Radius + 1.0, ballTop.Y);
             Assert.AreEqual(8, ballTop.VelocityY);
 
-            Assert.AreEqual(height - ballBottom.Radius, ballBottom.Y);
+            Assert.AreEqual(height - ballBottom.Radius - 1.0, ballBottom.Y);
             Assert.AreEqual(-8, ballBottom.VelocityY);
         }
     }

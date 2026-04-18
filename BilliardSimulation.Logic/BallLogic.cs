@@ -1,7 +1,9 @@
 ﻿using BilliardSimulation.Data;
+using BilliardSimulation.Model;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BilliardSimulation.Logic
 {
@@ -9,8 +11,9 @@ namespace BilliardSimulation.Logic
     {
         private readonly IBallRepository _repository;
         private readonly Random _random = new Random();
+        private const double visualMargin = 1.0;
 
-        
+
         public BallLogic(IBallRepository repository)
         {
             _repository = repository;
@@ -51,36 +54,57 @@ namespace BilliardSimulation.Logic
         {
             foreach (var ball in balls)
             {
-                
+
                 ball.X += ball.VelocityX;
                 ball.Y += ball.VelocityY;
 
-                // Перевіряємо зіткнення зі стінами (з урахуванням радіуса)
-                
-                if (ball.X - ball.Radius <= 0)
+                // Перевіряємо зіткнення зі стінами (з урахуванням радіуса та visualMargin)
+
+                if (ball.X - ball.Radius <= visualMargin)
                 {
-                    ball.X = ball.Radius;
+                    ball.X = ball.Radius + visualMargin;
                     ball.VelocityX = -ball.VelocityX;
                 }
-                
-                if (ball.X + ball.Radius >= tableWidth)
+
+                if (ball.X + ball.Radius >= tableWidth - visualMargin)
                 {
-                    ball.X = tableWidth - ball.Radius;
+                    ball.X = tableWidth - ball.Radius - visualMargin;
                     ball.VelocityX = -ball.VelocityX;
                 }
-                
-                if (ball.Y - ball.Radius <= 0)
+
+                if (ball.Y - ball.Radius <= visualMargin)
                 {
-                    ball.Y = ball.Radius;
+                    ball.Y = ball.Radius + visualMargin;
                     ball.VelocityY = -ball.VelocityY;
                 }
-                
-                if (ball.Y + ball.Radius >= tableHeight)
+
+                if (ball.Y + ball.Radius >= tableHeight - visualMargin)
                 {
-                    ball.Y = tableHeight - ball.Radius;
+                    ball.Y = tableHeight - ball.Radius - visualMargin;
                     ball.VelocityY = -ball.VelocityY;
                 }
+
+                // Final safety clamp to ensure positions stay within bounds
+                ball.X = Math.Max(ball.Radius + visualMargin, Math.Min(ball.X, tableWidth - ball.Radius - visualMargin));
+                ball.Y = Math.Max(ball.Radius + visualMargin, Math.Min(ball.Y, tableHeight - ball.Radius - visualMargin));
             }
+        }
+
+        public IReadOnlyList<BallModel> GetBallModels()
+        {
+            var ballList = _repository?.GetAllBalls() ?? new List<Ball>();
+            return ballList.Select(BallToModel).ToList().AsReadOnly();
+        }
+
+        public void UpdatePositionsForTable(double tableWidth, double tableHeight)
+        {
+            var balls = _repository?.GetAllBalls() ?? new List<Ball>();
+            UpdatePositions(balls, tableWidth, tableHeight);
+        }
+
+        private BallModel BallToModel(Ball ball)
+        {
+            return new BallModel(ball.X, ball.Y, ball.Radius, ball.VelocityX, ball.VelocityY);
         }
     }
 }
