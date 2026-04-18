@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BilliardSimulation.Data\BilliardSimulation.Data.csproj" />
+    <ProjectReference Include="..\BilliardSimulation.Logic\BilliardSimulation.Logic.csproj" />
   </ItemGroup>
 
   <ItemGroup>

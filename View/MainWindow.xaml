@@ -1,24 +1,62 @@
 ﻿<Window x:Class="View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Billiard Simulation" Height="600" Width="800">
+        Title="Billiard Simulation" Height="600" Width="800"
+        WindowStartupLocation="CenterScreen">
 
-    <Canvas Background="DarkGreen">
-        <ItemsControl ItemsSource="{Binding Balls}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Ellipse Width="30" Height="30" 
-                             Fill="White" 
-                             Stroke="Black"
-                             Canvas.Left="{Binding X}" 
-                             Canvas.Top="{Binding Y}"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </Canvas>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Панель управління -->
+        <Border Grid.Row="0" Background="LightGray" Padding="10" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="Number of balls:" VerticalAlignment="Center" Margin="5" FontSize="14"/>
+                <TextBox Text="{Binding BallCount, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="60" Margin="5" TextAlignment="Center"/>
+                <Button x:Name="CreateBallsButton" Content="Create Balls" Command="{Binding CreateBallsCommand}" 
+                        Margin="10,0" Padding="15,5" FontSize="14"/>
+                <Button Content="Exit" Command="{Binding ExitCommand}" 
+                        Margin="10,0" Padding="15,5" FontSize="14"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Ігрове поле -->
+        <Border x:Name="PlayFieldBorder" Grid.Row="1" BorderBrush="Black" BorderThickness="3" Background="DarkGreen">
+            <ItemsControl ItemsSource="{Binding Balls}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ClipToBounds="True">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Width="{Binding ActualWidth, ElementName=PlayFieldBorder}" Height="{Binding ActualHeight, ElementName=PlayFieldBorder}"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                        <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="30" Height="30" 
+                                 Fill="Orange" 
+                                 Stroke="Black"
+                                 StrokeThickness="2"
+                        Canvas.Left="{Binding Left}"
+                        Canvas.Top="{Binding Top}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <!-- Статус бар -->
+        <StatusBar Grid.Row="2" Margin="0,10,0,0">
+            <StatusBarItem>
+                <TextBlock Text="{Binding Balls.Count, StringFormat='Balls on table: {0}'}" 
+                           FontSize="12"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
 </Window>
