@@ -27,23 +27,22 @@ namespace BilliardSimulation.Logic
             
             for (int i = 0; i < count; i++)
             {
-                double radius = 15; 
+                double radius = Ball.DefaultRadius;
 
                 // use NextDouble to avoid clustering on integer boundaries
                 double x = radius + _random.NextDouble() * Math.Max(0, (tableWidth - 2 * radius));
                 double y = radius + _random.NextDouble() * Math.Max(0, (tableHeight - 2 * radius));
 
-               
+
                 // set reasonable initial speeds (pixels per tick)
                 double speedFactor = 6.0;
                 double vx = (_random.NextDouble() - 0.5) * speedFactor;
                 double vy = (_random.NextDouble() - 0.5) * speedFactor;
 
-               
-                var ball = new Ball(x, y, vx, vy);
-                ball.Radius = radius;
 
-                
+                var ball = new Ball(x, y, vx, vy, radius);
+
+
                 _repository.AddBall(ball);
             }
             // Diagnostic log

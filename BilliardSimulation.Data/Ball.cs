@@ -6,11 +6,13 @@ namespace BilliardSimulation.Data
 {
     public class Ball : INotifyPropertyChanged
     {
+        public const double DefaultRadius = 15;
+
         private double _x;
         private double _y;
         private double _velocityX;
         private double _velocityY;
-        private double _radius = 15;
+        private double _radius = DefaultRadius;
 
         public double X
         {
@@ -67,12 +69,13 @@ namespace BilliardSimulation.Data
         public double Left => X - Radius;
         public double Top => Y - Radius;
 
-        public Ball(double x, double y, double vx, double vy)
+        public Ball(double x, double y, double vx, double vy, double radius = DefaultRadius)
         {
             _x = x;
             _y = y;
             _velocityX = vx;
             _velocityY = vy;
+            _radius = radius;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

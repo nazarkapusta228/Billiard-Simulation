@@ -55,13 +55,13 @@ namespace BilliardSimulation.Tests
             var logic = new BallLogic(null);
             double width = 100;
             double height = 50;
-            var ball = new Ball(90, 25, 5, 0); // will move beyond right wall
-            ball.Radius = 10;
+            double velocityX = 5;
+            double velocityY = 0;
+            var ball = new Ball(90, 25, velocityX, velocityY, radius: 10);
 
             var list = new List<Ball> { ball };
             logic.UpdatePositions(list, width, height);
 
-            // After update, ball should be placed at width - radius - visualMargin (1.0) and velocityX inverted
             Assert.AreEqual(width - ball.Radius - 1.0, ball.X);
             Assert.AreEqual(-5, ball.VelocityX);
         }
@@ -72,8 +72,9 @@ namespace BilliardSimulation.Tests
             var logic = new BallLogic(null);
             double width = 100;
             double height = 50;
-            var ball = new Ball(5, 25, -10, 0);
-            ball.Radius = 10;
+            double velocityX = -10;
+            double velocityY = 0;
+            var ball = new Ball(5, 25, velocityX, velocityY, radius: 10);
 
             var list = new List<Ball> { ball };
             logic.UpdatePositions(list, width, height);
@@ -83,23 +84,34 @@ namespace BilliardSimulation.Tests
         }
 
         [TestMethod]
-        public void UpdatePositions_BouncesOffTopAndBottom()
+        public void UpdatePositions_BouncesOffTopWall()
         {
             var logic = new BallLogic(null);
             double width = 100;
             double height = 50;
-
-            var ballTop = new Ball(50, 5, 0, -8) { Radius = 10 };
-            var ballBottom = new Ball(50, 45, 0, 8) { Radius = 10 };
+            double velocityX = 0;
+            double velocityY = -8;
+            var ballTop = new Ball(50, 5, velocityX, velocityY, radius: 10);
 
             logic.UpdatePositions(new List<Ball> { ballTop }, width, height);
-            logic.UpdatePositions(new List<Ball> { ballBottom }, width, height);
 
             Assert.AreEqual(ballTop.Radius + 1.0, ballTop.Y);
             Assert.AreEqual(8, ballTop.VelocityY);
+        }
+
+        [TestMethod]
+        public void UpdatePositions_BouncesOffBottomWall()
+        {
+            var logic = new BallLogic(null);
+            double width = 100;
+            double height = 50;
+            double velocityX = 0;
+            double velocityY = 8;
+            var ballBottom = new Ball(50, 45, velocityX, velocityY, radius: 10);
+
+            logic.UpdatePositions(new List<Ball> { ballBottom }, width, height);
 
             Assert.AreEqual(height - ballBottom.Radius - 1.0, ballBottom.Y);
             Assert.AreEqual(-8, ballBottom.VelocityY);
         }
-    }
-}
+    }}
