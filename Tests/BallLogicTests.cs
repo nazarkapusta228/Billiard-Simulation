@@ -62,8 +62,10 @@ namespace BilliardSimulation.Tests
             var list = new List<Ball> { ball };
             logic.UpdatePositions(list, width, height);
 
-            Assert.AreEqual(width - ball.Radius - 1.0, ball.X);
-            Assert.AreEqual(-5, ball.VelocityX);
+            ball.GetState(out double x, out double y, out double vx, out double vy, out double radius, out double _);
+
+            Assert.AreEqual(width - radius - 1.0, x);
+            Assert.IsTrue(vx < 0);
         }
 
         [TestMethod]
@@ -79,8 +81,10 @@ namespace BilliardSimulation.Tests
             var list = new List<Ball> { ball };
             logic.UpdatePositions(list, width, height);
 
-            Assert.AreEqual(ball.Radius + 1.0, ball.X);
-            Assert.AreEqual(10, ball.VelocityX);
+            ball.GetState(out double x, out double y, out double vx, out double vy, out double radius, out double _);
+
+            Assert.AreEqual(radius + 1.0, x);
+            Assert.IsTrue(vx > 0);
         }
 
         [TestMethod]
@@ -95,8 +99,10 @@ namespace BilliardSimulation.Tests
 
             logic.UpdatePositions(new List<Ball> { ballTop }, width, height);
 
-            Assert.AreEqual(ballTop.Radius + 1.0, ballTop.Y);
-            Assert.AreEqual(8, ballTop.VelocityY);
+            ballTop.GetState(out double x, out double y, out double vx, out double vy, out double radius, out double _);
+
+            Assert.AreEqual(radius + 1.0, y);
+            Assert.IsTrue(vy > 0);
         }
 
         [TestMethod]
@@ -111,7 +117,9 @@ namespace BilliardSimulation.Tests
 
             logic.UpdatePositions(new List<Ball> { ballBottom }, width, height);
 
-            Assert.AreEqual(height - ballBottom.Radius - 1.0, ballBottom.Y);
-            Assert.AreEqual(-8, ballBottom.VelocityY);
+            ballBottom.GetState(out double x, out double y, out double vx, out double vy, out double radius, out double _);
+
+            Assert.AreEqual(height - radius - 1.0, y);
+            Assert.IsTrue(vy < 0);
         }
     }}

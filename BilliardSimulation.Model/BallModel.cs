@@ -11,6 +11,7 @@ namespace BilliardSimulation.Model
         private double _y;
         private double _velocityX;
         private double _velocityY;
+        private double _mass;
         private readonly double _radius;
 
         public double X
@@ -49,6 +50,12 @@ namespace BilliardSimulation.Model
             set => SetField(ref _velocityY, value);
         }
 
+        public double Mass
+        {
+            get => _mass;
+            set => SetField(ref _mass, value);
+        }
+
         public double Radius => _radius;
 
         public double Left => X - Radius;
@@ -56,13 +63,14 @@ namespace BilliardSimulation.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public BallModel(double x, double y, double radius, double velocityX = 0, double velocityY = 0)
+        public BallModel(double x, double y, double radius, double velocityX = 0, double velocityY = 0, double mass = 1.0)
         {
             _x = x;
             _y = y;
             _radius = radius;
             _velocityX = velocityX;
             _velocityY = velocityY;
+            _mass = mass;
         }
 
         protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)

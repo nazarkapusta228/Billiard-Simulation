@@ -19,6 +19,10 @@
                          Width="60" Margin="5" TextAlignment="Center"/>
                 <Button x:Name="CreateBallsButton" Content="Create Balls" Command="{Binding CreateBallsCommand}" 
                         Margin="10,0" Padding="15,5" FontSize="14"/>
+                <Button x:Name="StartButton" Content="Start" Command="{Binding StartSimulationCommand}" 
+                        Margin="10,0" Padding="15,5" FontSize="14"/>
+                <Button x:Name="StopButton" Content="Stop" Command="{Binding StopSimulationCommand}" 
+                        Margin="10,0" Padding="15,5" FontSize="14"/>
                 <Button Content="Exit" Command="{Binding ExitCommand}" 
                         Margin="10,0" Padding="15,5" FontSize="14"/>
             </StackPanel>
