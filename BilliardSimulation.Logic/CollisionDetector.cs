@@ -5,14 +5,14 @@ using System.Collections.Generic;
 namespace BilliardSimulation.Logic
 {
     /// <summary>
-    /// Handles collision detection and elastic collision physics
+    /// Handles collision detection and elastic collision physics using proper Wikipedia formulas
     /// </summary>
     public class CollisionDetector
     {
         private const double visualMargin = 1.0;
 
         /// <summary>
-        /// Detects and resolves collisions between two balls (elastic collision)
+        /// Detects and resolves collisions between two balls using proper elastic collision formulas
         /// </summary>
         public bool TryResolveBallCollision(Ball ball1, Ball ball2)
         {
@@ -23,7 +23,8 @@ namespace BilliardSimulation.Logic
             double dx = x2 - x1;
             double dy = y2 - y1;
             double distanceSq = dx * dx + dy * dy;
-            double minDistanceSq = (r1 + r2) * (r1 + r2);
+            double minDistance = r1 + r2;
+            double minDistanceSq = minDistance * minDistance;
 
             // Check if balls are close enough to collide
             if (distanceSq > minDistanceSq || distanceSq < 0.0001)
@@ -31,43 +32,51 @@ namespace BilliardSimulation.Logic
 
             double distance = Math.Sqrt(distanceSq);
 
-            // Normalize collision vector
+            // Normalize collision vector (from ball1 to ball2)
             double nx = dx / distance;
             double ny = dy / distance;
 
-            // Relative velocity
+            // Relative velocity (ball2 relative to ball1)
             double dvx = vx2 - vx1;
             double dvy = vy2 - vy1;
 
-            // Relative velocity in collision normal direction
-            double dvn = dvx * nx + dvy * ny;
+            // Relative velocity along the collision normal
+            double vn = dvx * nx + dvy * ny;
 
-            // Don't collide if moving apart (this prevents bounce-back)
-            if (dvn >= 0)
+            // Don't collide if balls are moving apart
+            if (vn >= 0)
                 return false;
 
-            // Calculate impulse scalar for elastic collision
-            double impulse = -2 * dvn / (1 / m1 + 1 / m2);
+            // Using the proper two-dimensional elastic collision formula from Wikipedia:
+            // v1' = v1 - (2*m2/(m1+m2)) * (<v1-v2, x1-x2> / ||x1-x2||²) * (x1-x2)
+            // v2' = v2 - (2*m1/(m1+m2)) * (<v2-v1, x2-x1> / ||x2-x1||²) * (x2-x1)
 
-            // Apply impulse
-            double newVx1 = vx1 + (impulse / m1) * nx;
-            double newVy1 = vy1 + (impulse / m1) * ny;
-            double newVx2 = vx2 - (impulse / m2) * nx;
-            double newVy2 = vy2 - (impulse / m2) * ny;
+            // Calculate the impulse factor
+            double impulseFactor = 2.0 * vn / (m1 + m2);
+
+            // Apply impulse to get new velocities
+            double newVx1 = vx1 + (m2 * impulseFactor) * nx;
+            double newVy1 = vy1 + (m2 * impulseFactor) * ny;
+            double newVx2 = vx2 - (m1 * impulseFactor) * nx;
+            double newVy2 = vy2 - (m1 * impulseFactor) * ny;
 
             // Set new velocities (thread-safe)
             ball1.SetVelocities(newVx1, newVy1);
             ball2.SetVelocities(newVx2, newVy2);
 
-            // Separate balls to prevent overlap - NO EXTRA ENERGY INJECTION
-            double overlap = (r1 + r2) - distance;
-            double separationX = (overlap / 2) * nx;
-            double separationY = (overlap / 2) * ny;
+            // Separate balls to prevent overlap - move them apart along collision normal
+            double overlap = minDistance - distance;
+            if (overlap > 0)
+            {
+                double totalMass = m1 + m2;
+                double separation1 = overlap * (m2 / totalMass);
+                double separation2 = overlap * (m1 / totalMass);
 
-            ball1.X -= separationX;
-            ball1.Y -= separationY;
-            ball2.X += separationX;
-            ball2.Y += separationY;
+                ball1.X -= separation1 * nx;
+                ball1.Y -= separation1 * ny;
+                ball2.X += separation2 * nx;
+                ball2.Y += separation2 * ny;
+            }
 
             return true;
         }

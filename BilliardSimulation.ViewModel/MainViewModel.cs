@@ -17,6 +17,8 @@ namespace BilliardSimulation.ViewModel
         private CancellationTokenSource _cancellationTokenSource;
         private Task _simulationTask;
         private bool _isRunning = false;
+        private bool _isPaused = false;
+        private ManualResetEventSlim _pauseEvent = new ManualResetEventSlim(true);
 
         private int _ballCount = 5;
         private double _tableWidth = 780;
@@ -43,10 +45,25 @@ namespace BilliardSimulation.ViewModel
             }
         }
 
+        public bool IsPaused
+        {
+            get => _isPaused;
+            set
+            {
+                _isPaused = value;
+                OnPropertyChanged();
+                // Update button text based on state
+                OnPropertyChanged(nameof(PauseButtonText));
+            }
+        }
+
+        public string PauseButtonText => _isPaused ? "▶ Resume" : "⏸ Pause";
+
         public ICommand CreateBallsCommand { get; }
         public ICommand ExitCommand { get; }
         public ICommand StartSimulationCommand { get; }
         public ICommand StopSimulationCommand { get; }
+        public ICommand PauseSimulationCommand { get; }
 
         public MainViewModel(IBallLogic logic)
         {
@@ -58,6 +75,7 @@ namespace BilliardSimulation.ViewModel
             ExitCommand = new RelayCommand(_ => Exit());
             StartSimulationCommand = new RelayCommand(_ => StartSimulation(), _ => !_isRunning);
             StopSimulationCommand = new RelayCommand(_ => StopSimulation(), _ => _isRunning);
+            PauseSimulationCommand = new RelayCommand(_ => TogglePause(), _ => _isRunning);
 
             // Subscribe to simulation updates (reactive programming)
             _logic.SimulationUpdated += OnSimulationUpdated;
@@ -117,9 +135,14 @@ namespace BilliardSimulation.ViewModel
                 return;
 
             _isRunning = true;
+            IsPaused = false;
+            _pauseEvent.Set(); // Ensure pause event is set (not paused)
             _cancellationTokenSource = new CancellationTokenSource();
 
             _simulationTask = SimulationLoopAsync(_cancellationTokenSource.Token);
+
+            // Update command states
+            CommandManager.InvalidateRequerySuggested();
             OnPropertyChanged(nameof(StartSimulationCommand));
             OnPropertyChanged(nameof(StopSimulationCommand));
         }
@@ -134,6 +157,9 @@ namespace BilliardSimulation.ViewModel
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    // Wait if paused
+                    _pauseEvent.Wait(cancellationToken);
+
                     long elapsedMs = stopwatch.ElapsedMilliseconds;
                     stopwatch.Restart();
 
@@ -151,12 +177,40 @@ namespace BilliardSimulation.ViewModel
             catch (OperationCanceledException)
             {
                 // Expected when stopping
+                Debug.WriteLine("[MainViewModel] Simulation cancelled properly");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainViewModel] Simulation error: {ex.Message}");
             }
             finally
             {
                 _isRunning = false;
+                IsPaused = false;
+                CommandManager.InvalidateRequerySuggested();
                 OnPropertyChanged(nameof(StartSimulationCommand));
                 OnPropertyChanged(nameof(StopSimulationCommand));
+            }
+        }
+
+        private void TogglePause()
+        {
+            if (!_isRunning)
+                return;
+
+            if (_isPaused)
+            {
+                // Resume
+                _pauseEvent.Set();
+                IsPaused = false;
+                Debug.WriteLine("[MainViewModel] Simulation resumed");
+            }
+            else
+            {
+                // Pause
+                _pauseEvent.Reset();
+                IsPaused = true;
+                Debug.WriteLine("[MainViewModel] Simulation paused");
             }
         }
 
@@ -165,6 +219,7 @@ namespace BilliardSimulation.ViewModel
             if (_isRunning)
             {
                 _cancellationTokenSource?.Cancel();
+                _pauseEvent.Set(); // Release pause to allow cancellation to complete
                 Debug.WriteLine("[MainViewModel] StopSimulation called - CancellationToken cancelled");
             }
         }
@@ -215,8 +270,8 @@ namespace BilliardSimulation.ViewModel
 
         public event EventHandler CanExecuteChanged
         {
-            add { }
-            remove { }
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
     }
 }
