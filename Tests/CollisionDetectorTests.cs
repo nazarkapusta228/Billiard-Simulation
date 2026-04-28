@@ -49,9 +49,11 @@ namespace BilliardSimulation.Tests
         {
             double velocityX = -10;
             double velocityY = 0;
+            double tableWidth = 100;
+            double tableHeight = 100;
             var ball = new Ball(5, 50, velocityX, velocityY, radius: 10);
 
-            _detector.ResolveWallCollisions(ball, 100, 100);
+            _detector.ResolveWallCollisions(ball, tableWidth, tableHeight);
 
             ball.GetState(out double x, out double y, out double vx, out double vy, out double _, out double _);
 
@@ -65,9 +67,11 @@ namespace BilliardSimulation.Tests
         {
             double velocityX = 10;
             double velocityY = 0;
+            double tableWidth = 100;
+            double tableHeight = 100;
             var ball = new Ball(95, 50, velocityX, velocityY, radius: 10);
 
-            _detector.ResolveWallCollisions(ball, 100, 100);
+            _detector.ResolveWallCollisions(ball, tableWidth, tableHeight);
 
             ball.GetState(out double x, out double y, out double vx, out double vy, out double _, out double _);
 
@@ -81,9 +85,11 @@ namespace BilliardSimulation.Tests
         {
             double velocityX = 0;
             double velocityY = -10;
+            double tableWidth = 100;
+            double tableHeight = 100;
             var ball = new Ball(50, 5, velocityX, velocityY, radius: 10);
 
-            _detector.ResolveWallCollisions(ball, 100, 100);
+            _detector.ResolveWallCollisions(ball, tableWidth, tableHeight);
 
             ball.GetState(out double x, out double y, out double vx, out double vy, out double _, out double _);
 
@@ -97,9 +103,11 @@ namespace BilliardSimulation.Tests
         {
             double velocityX = 0;
             double velocityY = 10;
+            double tableWidth = 100;
+            double tableHeight = 100;
             var ball = new Ball(50, 95, velocityX, velocityY, radius: 10);
 
-            _detector.ResolveWallCollisions(ball, 100, 100);
+            _detector.ResolveWallCollisions(ball, tableWidth, tableHeight);
 
             ball.GetState(out double x, out double y, out double vx, out double vy, out double _, out double _);
 
@@ -113,9 +121,11 @@ namespace BilliardSimulation.Tests
         {
             double velocityX = 0;
             double velocityY = 0;
+            double tableWidth = 100;
+            double tableHeight = 100;
             var ball = new Ball(-100, -100, velocityX, velocityY, radius: 10);
 
-            _detector.ResolveWallCollisions(ball, 100, 100);
+            _detector.ResolveWallCollisions(ball, tableWidth, tableHeight);
 
             ball.GetState(out double x, out double y, out double _, out double _, out double radius, out double _);
 
