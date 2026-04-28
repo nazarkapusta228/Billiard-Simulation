@@ -47,9 +47,7 @@ namespace BilliardSimulation.Logic
             if (vn >= 0)
                 return false;
 
-            // Using the proper two-dimensional elastic collision formula from Wikipedia:
-            // v1' = v1 - (2*m2/(m1+m2)) * (<v1-v2, x1-x2> / ||x1-x2||²) * (x1-x2)
-            // v2' = v2 - (2*m1/(m1+m2)) * (<v2-v1, x2-x1> / ||x2-x1||²) * (x2-x1)
+           
 
             // Calculate the impulse factor
             double impulseFactor = 2.0 * vn / (m1 + m2);

@@ -19,8 +19,10 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void TryResolveBallCollision_NoCollisionWhenFarApart()
         {
-            var ball1 = new Ball(50, 50, 0, 0, radius: 10);
-            var ball2 = new Ball(200, 200, 0, 0, radius: 10);
+            double velocityX = 0;
+            double velocityY = 0;
+            var ball1 = new Ball(50, 50, velocityX, velocityY, radius: 10);
+            var ball2 = new Ball(200, 200, velocityX, velocityY, radius: 10);
 
             bool collided = _detector.TryResolveBallCollision(ball1, ball2);
 
@@ -30,9 +32,12 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void TryResolveBallCollision_NoCollisionWhenMovingApart()
         {
-            // Balls touching but moving apart
-            var ball1 = new Ball(40, 50, -5, 0, radius: 10);
-            var ball2 = new Ball(60, 50, 5, 0, radius: 10);
+            double velocityX1 = -5;
+            double velocityY1 = 0;
+            double velocityX2 = 5;
+            double velocityY2 = 0;
+            var ball1 = new Ball(40, 50, velocityX1, velocityY1, radius: 10);
+            var ball2 = new Ball(60, 50, velocityX2, velocityY2, radius: 10);
 
             bool collided = _detector.TryResolveBallCollision(ball1, ball2);
 
@@ -42,7 +47,9 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void ResolveWallCollisions_BouncesOffLeftWall()
         {
-            var ball = new Ball(5, 50, -10, 0, radius: 10);
+            double velocityX = -10;
+            double velocityY = 0;
+            var ball = new Ball(5, 50, velocityX, velocityY, radius: 10);
 
             _detector.ResolveWallCollisions(ball, 100, 100);
 
@@ -56,7 +63,9 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void ResolveWallCollisions_BouncesOffRightWall()
         {
-            var ball = new Ball(95, 50, 10, 0, radius: 10);
+            double velocityX = 10;
+            double velocityY = 0;
+            var ball = new Ball(95, 50, velocityX, velocityY, radius: 10);
 
             _detector.ResolveWallCollisions(ball, 100, 100);
 
@@ -70,7 +79,9 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void ResolveWallCollisions_BouncesOffTopWall()
         {
-            var ball = new Ball(50, 5, 0, -10, radius: 10);
+            double velocityX = 0;
+            double velocityY = -10;
+            var ball = new Ball(50, 5, velocityX, velocityY, radius: 10);
 
             _detector.ResolveWallCollisions(ball, 100, 100);
 
@@ -84,7 +95,9 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void ResolveWallCollisions_BouncesOffBottomWall()
         {
-            var ball = new Ball(50, 95, 0, 10, radius: 10);
+            double velocityX = 0;
+            double velocityY = 10;
+            var ball = new Ball(50, 95, velocityX, velocityY, radius: 10);
 
             _detector.ResolveWallCollisions(ball, 100, 100);
 
@@ -98,8 +111,9 @@ namespace BilliardSimulation.Tests
         [TestMethod]
         public void ResolveWallCollisions_ClampsBallInBounds()
         {
-            // Ball way outside bounds
-            var ball = new Ball(-100, -100, 0, 0, radius: 10);
+            double velocityX = 0;
+            double velocityY = 0;
+            var ball = new Ball(-100, -100, velocityX, velocityY, radius: 10);
 
             _detector.ResolveWallCollisions(ball, 100, 100);
 
