@@ -13,8 +13,7 @@ namespace BilliardSimulation.Logic
         private readonly IBallRepository _repository;
         private readonly Random _random = new Random();
         private readonly CollisionDetector _collisionDetector = new CollisionDetector();
-        private readonly object _lockObject = new object();
-        private readonly HashSet<(int, int)> _processedCollisions = new HashSet<(int, int)>();
+        private readonly object _creationLock = new object();  // тільки для створення куль
 
         public event EventHandler<SimulationUpdateEventArgs> SimulationUpdated;
 
@@ -25,7 +24,7 @@ namespace BilliardSimulation.Logic
 
         public void CreateRandomBalls(int count, double tableWidth, double tableHeight)
         {
-            lock (_lockObject)
+            lock (_creationLock)
             {
                 _repository.ClearAllBalls();
 
@@ -34,11 +33,9 @@ namespace BilliardSimulation.Logic
                     double radius = Ball.DefaultRadius;
                     double mass = Ball.DefaultMass;
 
-                    // Random position within bounds
                     double x = radius + _random.NextDouble() * Math.Max(0, (tableWidth - 2 * radius));
                     double y = radius + _random.NextDouble() * Math.Max(0, (tableHeight - 2 * radius));
 
-                    // Random initial velocities
                     double speedFactor = 4.0;
                     double vx = (_random.NextDouble() - 0.5) * speedFactor;
                     double vy = (_random.NextDouble() - 0.5) * speedFactor;
@@ -53,42 +50,25 @@ namespace BilliardSimulation.Logic
 
         public void UpdatePositions(IEnumerable<Ball> balls, double tableWidth, double tableHeight)
         {
-            lock (_lockObject)
+            var ballList = balls.ToList();
+
+            Parallel.ForEach(ballList, ball =>
             {
-                var ballList = balls.ToList();
+                ball.GetState(out double x, out double y, out double vx, out double vy, out _, out _);
+                ball.X = x + vx;
+                ball.Y = y + vy;
+            });
 
-                // Update positions
-                foreach (var ball in ballList)
+            Parallel.ForEach(ballList, ball =>
+            {
+                _collisionDetector.ResolveWallCollisions(ball, tableWidth, tableHeight);
+            });
+
+            for (int i = 0; i < ballList.Count; i++)
+            {
+                for (int j = i + 1; j < ballList.Count; j++)
                 {
-                    ball.GetState(out double x, out double y, out double vx, out double vy, out double _, out double _);
-                    ball.X = x + vx;
-                    ball.Y = y + vy;
-                }
-
-                // Resolve wall collisions
-                foreach (var ball in ballList)
-                {
-                    _collisionDetector.ResolveWallCollisions(ball, tableWidth, tableHeight);
-                }
-
-                // Clear collision tracking for this frame
-                _processedCollisions.Clear();
-
-                // Resolve ball-to-ball collisions
-                for (int i = 0; i < ballList.Count; i++)
-                {
-                    for (int j = i + 1; j < ballList.Count; j++)
-                    {
-                        var pairKey = (i, j);
-                        // Only process each pair once per frame
-                        if (!_processedCollisions.Contains(pairKey))
-                        {
-                            if (_collisionDetector.TryResolveBallCollision(ballList[i], ballList[j]))
-                            {
-                                _processedCollisions.Add(pairKey);
-                            }
-                        }
-                    }
+                    _collisionDetector.TryResolveBallCollision(ballList[i], ballList[j]);
                 }
             }
         }
@@ -96,20 +76,17 @@ namespace BilliardSimulation.Logic
         public async Task UpdatePositionsAsync(double tableWidth, double tableHeight)
         {
             var balls = _repository?.GetAllBalls() ?? new List<Ball>();
+
             await Task.Run(() => UpdatePositions(balls, tableWidth, tableHeight));
 
-            // Notify subscribers about update
             var models = GetBallModels();
             SimulationUpdated?.Invoke(this, new SimulationUpdateEventArgs { UpdatedBalls = models });
         }
 
         public IReadOnlyList<BallModel> GetBallModels()
         {
-            lock (_lockObject)
-            {
-                var ballList = _repository?.GetAllBalls() ?? new List<Ball>();
-                return ballList.Select(BallToModel).ToList().AsReadOnly();
-            }
+            var ballList = _repository?.GetAllBalls() ?? new List<Ball>();
+            return ballList.Select(BallToModel).ToList().AsReadOnly();
         }
 
         private BallModel BallToModel(Ball ball)
