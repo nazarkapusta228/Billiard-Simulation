@@ -11,16 +11,22 @@ namespace BilliardSimulation.Logic
     public class BallLogic : IBallLogic
     {
         private readonly IBallRepository _repository;
+        private readonly IDiagnosticLogger _logger;
         private readonly Random _random = new Random();
         private readonly CollisionDetector _collisionDetector = new CollisionDetector();
         private readonly object _creationLock = new object();  // тільки для створення куль
 
         public event EventHandler<SimulationUpdateEventArgs> SimulationUpdated;
 
-        public BallLogic(IBallRepository repository)
+
+        public BallLogic(
+            IBallRepository repository,
+            IDiagnosticLogger logger)
         {
             _repository = repository;
+            _logger = logger;
         }
+
 
         public void CreateRandomBalls(int count, double tableWidth, double tableHeight)
         {
@@ -70,6 +76,13 @@ namespace BilliardSimulation.Logic
                 {
                     _collisionDetector.TryResolveBallCollision(ballList[i], ballList[j]);
                 }
+            }
+
+
+            //3 etap
+            foreach (var ball in ballList)
+            {
+                _logger.LogBallState(ball);
             }
         }
 

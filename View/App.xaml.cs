@@ -5,20 +5,23 @@ using BilliardSimulation.ViewModel;
 
 namespace View
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            // Create dependencies here (composition root)
+            // Data layer
             IBallRepository repository = new BallRepository();
-            IBallLogic logic = new BallLogic(repository);
+            IDiagnosticLogger logger = new DiagnosticLogger();
+
+            // Logic layer
+            IBallLogic logic = new BallLogic(repository, logger);
+
+            // ViewModel
             var viewModel = new MainViewModel(logic);
 
+            // UI
             var mainWindow = new MainWindow();
             mainWindow.DataContext = viewModel;
             mainWindow.Show();
