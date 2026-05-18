@@ -10,7 +10,7 @@ namespace BilliardSimulation.Data
     public class DiagnosticLogger : IDiagnosticLogger
     {
         private readonly BlockingCollection<string> _queue =
-            new BlockingCollection<string>();
+    new BlockingCollection<string>(boundedCapacity: 1000);
 
         private readonly CancellationTokenSource _cts =
             new CancellationTokenSource();

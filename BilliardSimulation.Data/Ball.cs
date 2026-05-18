@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
 
 namespace BilliardSimulation.Data
 {
@@ -32,139 +30,44 @@ namespace BilliardSimulation.Data
             _mass = mass;
         }
 
-        // =========================
-        // POSITION
-        // =========================
-
         public double X
         {
-            get
-            {
-                lock (_lockObject)
-                    return _x;
-            }
-            set
-            {
-                bool changed;
-
-                lock (_lockObject)
-                {
-                    changed = _x != value;
-                    _x = value;
-                }
-
-                if (changed)
-                    OnPropertyChanged(nameof(Left));
-            }
+            get { lock (_lockObject) return _x; }
+            set { lock (_lockObject) _x = value; }
         }
 
         public double Y
         {
-            get
-            {
-                lock (_lockObject)
-                    return _y;
-            }
-            set
-            {
-                bool changed;
-
-                lock (_lockObject)
-                {
-                    changed = _y != value;
-                    _y = value;
-                }
-
-                if (changed)
-                    OnPropertyChanged(nameof(Top));
-            }
+            get { lock (_lockObject) return _y; }
+            set { lock (_lockObject) _y = value; }
         }
-
-        // =========================
-        // VELOCITY
-        // =========================
 
         public double VelocityX
         {
-            get
-            {
-                lock (_lockObject)
-                    return _velocityX;
-            }
-            set
-            {
-                lock (_lockObject)
-                    _velocityX = value;
-            }
+            get { lock (_lockObject) return _velocityX; }
+            set { lock (_lockObject) _velocityX = value; }
         }
 
         public double VelocityY
         {
-            get
-            {
-                lock (_lockObject)
-                    return _velocityY;
-            }
-            set
-            {
-                lock (_lockObject)
-                    _velocityY = value;
-            }
+            get { lock (_lockObject) return _velocityY; }
+            set { lock (_lockObject) _velocityY = value; }
         }
-
-        // =========================
-        // PHYSICAL PROPERTIES
-        // =========================
 
         public double Radius
         {
-            get
-            {
-                lock (_lockObject)
-                    return _radius;
-            }
-            set
-            {
-                bool changed;
-
-                lock (_lockObject)
-                {
-                    changed = _radius != value;
-                    _radius = value;
-                }
-
-                if (changed)
-                {
-                    OnPropertyChanged(nameof(Left));
-                    OnPropertyChanged(nameof(Top));
-                }
-            }
+            get { lock (_lockObject) return _radius; }
+            set { lock (_lockObject) _radius = value; }
         }
 
         public double Mass
         {
-            get
-            {
-                lock (_lockObject)
-                    return _mass;
-            }
-            set
-            {
-                lock (_lockObject)
-                    _mass = value;
-            }
+            get { lock (_lockObject) return _mass; }
+            set { lock (_lockObject) _mass = value; }
         }
-
-        // =========================
-        // DERIVED UI PROPERTIES
-        // =========================
 
         public double Left => X - Radius;
         public double Top => Y - Radius;
-
-        // =========================
-        // THREAD SAFE SNAPSHOT
-        // =========================
 
         public void GetState(out double x, out double y,
                              out double vx, out double vy,
@@ -181,9 +84,15 @@ namespace BilliardSimulation.Data
             }
         }
 
-        // =========================
-        // VELOCITY UPDATE AFTER COLLISION
-        // =========================
+        // 🔥 ОЦЕ ГОЛОВНЕ
+        public void ApplyVelocityStep(double deltaTime)
+        {
+            lock (_lockObject)
+            {
+                _x += _velocityX * deltaTime;
+                _y += _velocityY * deltaTime;
+            }
+        }
 
         public void SetVelocities(double vx, double vy)
         {
@@ -192,15 +101,6 @@ namespace BilliardSimulation.Data
                 _velocityX = vx;
                 _velocityY = vy;
             }
-        }
-
-        // =========================
-        // PROPERTY CHANGED
-        // =========================
-
-        private void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
