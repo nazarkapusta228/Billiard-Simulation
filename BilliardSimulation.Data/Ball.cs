@@ -84,7 +84,7 @@ namespace BilliardSimulation.Data
             }
         }
 
-        // 🔥 ОЦЕ ГОЛОВНЕ
+        // 
         public void ApplyVelocityStep(double deltaTime)
         {
             lock (_lockObject)
