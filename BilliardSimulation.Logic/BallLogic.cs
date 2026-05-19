@@ -78,11 +78,21 @@ namespace BilliardSimulation.Logic
         }
 
         public void UpdatePositions(
-            IEnumerable<Ball> balls,
-            double tableWidth,
-            double tableHeight)
+    IEnumerable<Ball> balls,
+    double tableWidth,
+    double tableHeight)
         {
             List<Ball> list = balls.ToList();
+
+            var pairs = new List<(int i, int j)>();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    pairs.Add((i, j));
+                }
+            }
 
             double currentTime =
                 _stopwatch.Elapsed.TotalSeconds;
@@ -95,18 +105,10 @@ namespace BilliardSimulation.Logic
             // clamp żeby uniknąć huge lag spike
             deltaTime = Math.Min(deltaTime, 0.03);
 
-            // =========================
-            // 1. RUCH
-            // =========================
-
             Parallel.ForEach(list, ball =>
             {
                 ball.ApplyVelocityStep(deltaTime);
             });
-
-            // =========================
-            // 2. KOLIZJE ZE ŚCIANAMI
-            // =========================
 
             Parallel.ForEach(list, ball =>
             {
@@ -116,29 +118,19 @@ namespace BilliardSimulation.Logic
                     tableHeight);
             });
 
-            // =========================
-            // 3. KOLIZJE MIĘDZY KULAMI
-            // =========================
-
-            for (int i = 0; i < list.Count; i++)
+            Parallel.ForEach(pairs, pair =>
             {
-                for (int j = i + 1; j < list.Count; j++)
-                {
-                    _collisionDetector.TryResolveBallCollision(
-                        list[i],
-                        list[j]);
-                }
-            }
-
-            // =========================
-            // 4. LOGOWANIE
-            // =========================
+                _collisionDetector.TryResolveBallCollision(
+                    list[pair.i],
+                    list[pair.j]);
+            });
 
             foreach (Ball ball in list)
             {
                 _logger.LogBallState(ball);
             }
         }
+
 
         public async Task UpdatePositionsAsync(
             double tableWidth,

@@ -60,8 +60,8 @@ namespace BilliardSimulation.Data
 
                     await writer.FlushAsync();
 
-                    // 
-                    await Task.Delay(5);
+                    
+                    
                 }
             }
             catch (OperationCanceledException)
