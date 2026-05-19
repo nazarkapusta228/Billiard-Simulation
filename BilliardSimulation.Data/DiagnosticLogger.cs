@@ -60,7 +60,7 @@ namespace BilliardSimulation.Data
 
                     await writer.FlushAsync();
 
-                    // симуляція повільного диска
+                    // 
                     await Task.Delay(5);
                 }
             }

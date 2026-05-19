@@ -32,38 +32,86 @@ namespace BilliardSimulation.Data
 
         public double X
         {
-            get { lock (_lockObject) return _x; }
-            set { lock (_lockObject) _x = value; }
+            get
+            {
+                lock (_lockObject)
+                    return _x;
+            }
+            set
+            {
+                lock (_lockObject)
+                    _x = value;
+            }
         }
 
         public double Y
         {
-            get { lock (_lockObject) return _y; }
-            set { lock (_lockObject) _y = value; }
+            get
+            {
+                lock (_lockObject)
+                    return _y;
+            }
+            set
+            {
+                lock (_lockObject)
+                    _y = value;
+            }
         }
 
         public double VelocityX
         {
-            get { lock (_lockObject) return _velocityX; }
-            set { lock (_lockObject) _velocityX = value; }
+            get
+            {
+                lock (_lockObject)
+                    return _velocityX;
+            }
+            set
+            {
+                lock (_lockObject)
+                    _velocityX = value;
+            }
         }
 
         public double VelocityY
         {
-            get { lock (_lockObject) return _velocityY; }
-            set { lock (_lockObject) _velocityY = value; }
+            get
+            {
+                lock (_lockObject)
+                    return _velocityY;
+            }
+            set
+            {
+                lock (_lockObject)
+                    _velocityY = value;
+            }
         }
 
         public double Radius
         {
-            get { lock (_lockObject) return _radius; }
-            set { lock (_lockObject) _radius = value; }
+            get
+            {
+                lock (_lockObject)
+                    return _radius;
+            }
+            set
+            {
+                lock (_lockObject)
+                    _radius = value;
+            }
         }
 
         public double Mass
         {
-            get { lock (_lockObject) return _mass; }
-            set { lock (_lockObject) _mass = value; }
+            get
+            {
+                lock (_lockObject)
+                    return _mass;
+            }
+            set
+            {
+                lock (_lockObject)
+                    _mass = value;
+            }
         }
 
         public double Left => X - Radius;
@@ -84,7 +132,6 @@ namespace BilliardSimulation.Data
             }
         }
 
-        // 
         public void ApplyVelocityStep(double deltaTime)
         {
             lock (_lockObject)
